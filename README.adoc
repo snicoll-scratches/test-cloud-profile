@@ -1,0 +1,59 @@
+# Enabling the cloud profile
+
+This sample project demonstrates that the cloud profile does not seem to be enabled properly if the
+user specify its own.
+
+Using buildpack 3.3
+
+## No profile enabled
+
+Push this app with no modification at all and you should be able to see this if you hit the root
+
+```
+{
+cloud: "Hello from the Cloud",
+dev: "Dev profile not enabled"
+}
+```
+
+```
+2015-10-21T11:20:07.16+0200 [APP/0]      OUT 2015-10-21 09:20:07.158  INFO 22 --- [           main] pertySourceApplicationContextInitializer : Adding 'cloud' PropertySource to ApplicationContext
+2015-10-21T11:20:07.22+0200 [APP/0]      OUT 2015-10-21 09:20:07.220  INFO 22 --- [           main] nfigurationApplicationContextInitializer : Adding cloud service auto-reconfiguration to ApplicationContext
+2015-10-21T11:20:07.23+0200 [APP/0]      OUT 2015-10-21 09:20:07.236  INFO 22 --- [           main] com.example.DemoApplication              : Starting DemoApplication on 3nol6rrd1cm with PID 22 (/home/vcap/app started by vcap in /home/vcap/app)
+2015-10-21T11:20:07.23+0200 [APP/0]      OUT 2015-10-21 09:20:07.236 DEBUG 22 --- [           main] o.s.boot.SpringApplication               : Loading source class com.example.DemoApplication
+```
+
+NOTE: Note that _Activated profiles cloud_ is not logged because the list of active profiles is empty.
+
+## Enabling a custom profile
+
+Now let's enable a custom profile. We expect the `cloud` profile to be enabled regardless.
+
+Create the following `manifest.yml`
+
+```
+---
+applications:
+- name: test-cf-profile
+  env:
+    SPRING_PROFILES_ACTIVE: dev
+```
+
+The `cloud` profile is _still_ not enabled anymore (according to Boot).
+
+```
+2015-10-21T11:03:25.52+0200 [APP/0]      OUT 2015-10-21 09:03:25.526  INFO 22 --- [           main] pertySourceApplicationContextInitializer : Adding 'cloud' PropertySource to ApplicationContext
+2015-10-21T11:03:25.58+0200 [APP/0]      OUT 2015-10-21 09:03:25.580  INFO 22 --- [           main] nfigurationApplicationContextInitializer : Adding cloud service auto-reconfiguration to ApplicationContext
+2015-10-21T11:03:25.59+0200 [APP/0]      OUT 2015-10-21 09:03:25.594  INFO 22 --- [           main] com.example.DemoApplication              : Starting DemoApplication on 3nol6rrd1cd with PID 22 (/home/vcap/app started by vcap in /home/vcap/app)
+2015-10-21T11:03:25.59+0200 [APP/0]      OUT 2015-10-21 09:03:25.595 DEBUG 22 --- [           main] o.s.boot.SpringApplication               : Loading source class com.example.DemoApplication
+2015-10-21T11:03:25.63+0200 [APP/0]      OUT 2015-10-21 09:03:25.638 DEBUG 22 --- [           main] o.s.b.c.c.ConfigFileApplicationListener  : Activated profiles dev
+```
+
+But the configuration file does not seem to be loaded either:
+
+```
+{
+cloud: "Cloud profile not enabled",
+dev: "Dev profile is enabled"
+}
+```
