@@ -34,7 +34,7 @@ Create the following `manifest.yml`
 ```
 ---
 applications:
-- name: test-cf-profile
+- name: test-cloud-profile
   env:
     SPRING_PROFILES_ACTIVE: dev
 ```
